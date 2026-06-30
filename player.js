@@ -1,59 +1,42 @@
-// ==========================
-// Movie Together - player.js
-// Sync-ready video controller
-// ==========================
-
 const video = document.getElementById("videoPlayer");
 
-// Prevent infinite sync loops
-let isRemoteAction = false;
+let isRemote = false;
 
-// ==========================
-// CORE PLAYER EVENTS
-// ==========================
-
-// PLAY event
+// PLAY
 video.addEventListener("play", () => {
-    if (isRemoteAction) return;
+    if (isRemote) return;
 
-    console.log("Local play triggered");
-
-    sendPlayerEvent({
+    updateRoom({
         type: "play",
         time: video.currentTime
     });
 });
 
-// PAUSE event
+// PAUSE
 video.addEventListener("pause", () => {
-    if (isRemoteAction) return;
+    if (isRemote) return;
 
-    console.log("Local pause triggered");
-
-    sendPlayerEvent({
+    updateRoom({
         type: "pause",
         time: video.currentTime
     });
 });
 
-// SEEK event
+// SEEK
 video.addEventListener("seeked", () => {
-    if (isRemoteAction) return;
+    if (isRemote) return;
 
-    console.log("Local seek triggered");
-
-    sendPlayerEvent({
+    updateRoom({
         type: "seek",
         time: video.currentTime
     });
 });
 
-// ==========================
-// REMOTE ACTION HANDLER
-// ==========================
+// LISTEN FOR REMOTE UPDATES
+listenRoom((data) => {
+    if (!data) return;
 
-function handleRemoteEvent(data) {
-    isRemoteAction = true;
+    isRemote = true;
 
     if (data.type === "play") {
         video.currentTime = data.time;
@@ -69,33 +52,5 @@ function handleRemoteEvent(data) {
         video.currentTime = data.time;
     }
 
-    setTimeout(() => {
-        isRemoteAction = false;
-    }, 100);
-}
-
-// ==========================
-// OUTGOING EVENTS (placeholder)
-// ==========================
-// Later this will send data to Firebase / WebSocket
-
-function sendPlayerEvent(event) {
-    console.log("Sending event:", event);
-
-    // TODO:
-    // firebase.database().ref("rooms/" + roomCode).set(event);
-    // OR Firestore update
-}
-
-// ==========================
-// OPTIONAL: FORCE SYNC
-// ==========================
-
-function syncTo(time) {
-    isRemoteAction = true;
-    video.currentTime = time;
-
-    setTimeout(() => {
-        isRemoteAction = false;
-    }, 100);
-}
+    setTimeout(() => isRemote = false, 200);
+});
