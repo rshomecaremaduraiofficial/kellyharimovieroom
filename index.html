@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Together ❤️</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="background"></div>
+
+    <div class="container">
+
+        <h1>🎬 Movie Together</h1>
+
+        <p class="subtitle">
+            Watch movies together from anywhere in the world.
+        </p>
+
+        <div class="card">
+
+            <input type="text" id="username" placeholder="Your Name">
+
+            <input type="text" id="roomCode" placeholder="Room Code">
+
+            <div class="buttons">
+
+                <button id="createRoom">
+                    Create Room
+                </button>
+
+                <button id="joinRoom">
+                    Join Room
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        const createBtn = document.getElementById("createRoom");
+        const joinBtn = document.getElementById("joinRoom");
+
+        createBtn.onclick = () => {
+
+            const username = document.getElementById("username").value.trim();
+
+            if (username == "") {
+                alert("Enter your name");
+                return;
+            }
+
+            const room = Math.random().toString(36).substring(2, 8).toUpperCase();
+
+            localStorage.setItem("username", username);
+
+            window.location.href = "room.html?room=" + room;
+
+        }
+
+        joinBtn.onclick = () => {
+
+            const username = document.getElementById("username").value.trim();
+
+            const room = document.getElementById("roomCode").value.trim().toUpperCase();
+
+            if (username == "") {
+                alert("Enter your name");
+                return;
+            }
+
+            if (room == "") {
+                alert("Enter room code");
+                return;
+            }
+
+            localStorage.setItem("username", username);
+
+            window.location.href = "room.html?room=" + room;
+
+        }
+
+    </script>
+
+</body>
+
+</html>

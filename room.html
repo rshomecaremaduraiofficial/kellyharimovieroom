@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Room ❤️</title>
+
+    <link rel="stylesheet" href="style1.css">
+</head>
+
+<body>
+
+    <div class="top-bar">
+        <h2>🎬 Movie Room</h2>
+        <div id="roomInfo"></div>
+    </div>
+
+    <div class="main">
+
+        <!-- LEFT: VIDEO -->
+        <div class="video-section">
+
+            <div class="video-frame">
+                <video id="videoPlayer" controls></video>
+            </div>
+
+            <input type="file" id="fileInput" accept="video/*">
+
+        </div>
+
+        <!-- RIGHT: CHAT -->
+        <div class="chat-section">
+
+            <div id="chatBox"></div>
+
+            <div class="chat-input">
+                <input type="text" id="messageInput" placeholder="Type message...">
+                <button id="sendBtn">Send</button>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+    <script src="chat.js"></script>
+    <script src="player.js"></script>
+
+</body>
+
+</html>
