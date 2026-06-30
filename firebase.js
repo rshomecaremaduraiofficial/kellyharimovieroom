@@ -1,5 +1,5 @@
 // ==========================
-// Firebase Setup - Movie Together
+// Firebase Setup - FIXED VERSION
 // ==========================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -8,33 +8,30 @@ import {
     doc,
     setDoc,
     onSnapshot,
-    updateDoc,
     collection,
     addDoc,
     serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // ==========================
-// YOUR FIREBASE CONFIG
-// (Replace with your own)
+// CONFIG
 // ==========================
 
 const firebaseConfig = {
     apiKey: "AIzaSyDFDw2EmSd1YW5MzgHL_avqZJPyE2qZ90Y",
     authDomain: "movie-84a98.firebaseapp.com",
     projectId: "movie-84a98",
-    storageBucket: "movie-84a98.firebasestorage.app",
+    storageBucket: "movie-84a98.appspot.com",
     messagingSenderId: "1026087109302",
-    appId: "1:1026087109302:web:988f3ec263b2847d9e9c17",
-    measurementId: "G-GS7GWN52HL"
+    appId: "1:1026087109302:web:988f3ec263b2847d9e9c17"
 };
 
-// Init
+// Init Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 // ==========================
-// ROOM SETUP
+// ROOM
 // ==========================
 
 const params = new URLSearchParams(window.location.search);
@@ -44,21 +41,19 @@ const roomRef = doc(db, "rooms", roomCode);
 const chatRef = collection(db, "rooms", roomCode, "chat");
 
 // ==========================
-// EXPORTS (used by other files)
+// MAKE GLOBAL ACCESSIBLE
 // ==========================
 
-window.firebaseDB = {
-    db,
-    roomRef,
-    chatRef,
-    roomCode
-};
+window.roomCode = roomCode;
+window.roomRef = roomRef;
+window.chatRef = chatRef;
+window.db = db;
 
 // ==========================
-// REALTIME ROOM LISTENER
+// ROOM SYNC (REAL-TIME)
 // ==========================
 
-export function listenRoomChanges(callback) {
+export function listenRoom(callback) {
     onSnapshot(roomRef, (docSnap) => {
         if (docSnap.exists()) {
             callback(docSnap.data());
@@ -66,28 +61,21 @@ export function listenRoomChanges(callback) {
     });
 }
 
-// ==========================
-// UPDATE VIDEO STATE
-// ==========================
-
-export async function updateRoomState(data) {
-    await setDoc(roomRef, data, { merge: true });
+// update play/pause/seek state
+export function updateRoom(data) {
+    setDoc(roomRef, data, { merge: true });
 }
 
 // ==========================
-// SEND CHAT MESSAGE
+// CHAT SYNC
 // ==========================
 
-export async function sendChat(message) {
-    await addDoc(chatRef, {
+export function sendChat(message) {
+    addDoc(chatRef, {
         ...message,
         timestamp: serverTimestamp()
     });
 }
-
-// ==========================
-// LISTEN CHAT
-// ==========================
 
 export function listenChat(callback) {
     onSnapshot(chatRef, (snapshot) => {
