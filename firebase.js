@@ -1,7 +1,3 @@
-// ==========================
-// Firebase Setup - FIXED VERSION
-// ==========================
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
     getFirestore,
@@ -13,10 +9,6 @@ import {
     serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// ==========================
-// CONFIG
-// ==========================
-
 const firebaseConfig = {
     apiKey: "AIzaSyDFDw2EmSd1YW5MzgHL_avqZJPyE2qZ90Y",
     authDomain: "movie-84a98.firebaseapp.com",
@@ -26,63 +18,48 @@ const firebaseConfig = {
     appId: "1:1026087109302:web:988f3ec263b2847d9e9c17"
 };
 
-// Init Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// ==========================
-// ROOM
-// ==========================
+// room id
+const room = new URLSearchParams(location.search).get("room");
 
-const params = new URLSearchParams(window.location.search);
-const roomCode = params.get("room");
+const roomRef = doc(db, "rooms", room);
+const chatRef = collection(db, "rooms", room, "chat");
 
-const roomRef = doc(db, "rooms", roomCode);
-const chatRef = collection(db, "rooms", roomCode, "chat");
+// expose globally (IMPORTANT)
+window.firebaseDB = {
+    db,
+    room,
+    roomRef,
+    chatRef
+};
 
-// ==========================
-// MAKE GLOBAL ACCESSIBLE
-// ==========================
+// UPDATE ROOM STATE
+window.updateRoom = async (data) => {
+    await setDoc(roomRef, data, { merge: true });
+};
 
-window.roomCode = roomCode;
-window.roomRef = roomRef;
-window.chatRef = chatRef;
-window.db = db;
-
-// ==========================
-// ROOM SYNC (REAL-TIME)
-// ==========================
-
-export function listenRoom(callback) {
-    onSnapshot(roomRef, (docSnap) => {
-        if (docSnap.exists()) {
-            callback(docSnap.data());
-        }
+// LISTEN ROOM STATE
+window.listenRoom = (callback) => {
+    onSnapshot(roomRef, (snap) => {
+        if (snap.exists()) callback(snap.data());
     });
-}
+};
 
-// update play/pause/seek state
-export function updateRoom(data) {
-    setDoc(roomRef, data, { merge: true });
-}
-
-// ==========================
-// CHAT SYNC
-// ==========================
-
-export function sendChat(message) {
-    addDoc(chatRef, {
-        ...message,
+// SEND CHAT
+window.sendChat = async (msg) => {
+    await addDoc(chatRef, {
+        ...msg,
         timestamp: serverTimestamp()
     });
-}
+};
 
-export function listenChat(callback) {
-    onSnapshot(chatRef, (snapshot) => {
-        snapshot.docChanges().forEach(change => {
-            if (change.type === "added") {
-                callback(change.doc.data());
-            }
+// LISTEN CHAT
+window.listenChat = (callback) => {
+    onSnapshot(chatRef, (snap) => {
+        snap.docChanges().forEach(c => {
+            if (c.type === "added") callback(c.doc.data());
         });
     });
-}
+};
